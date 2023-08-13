@@ -1,0 +1,19 @@
+#!/bin/bash
+ascii_art=$(cat << "EOF"
+                __
+             .-'  |
+            /   <\|
+           /     \'
+           |_.- o-o
+           / C  -._)\   
+          /',        |  
+         |   `-,_,__,'
+         (,,)====[_]=|  Gnomes_in_the_Pod: 
+           '.   ____/
+            | -|-|_
+            |____)_)    FLAG-{gn0m30kub3s0st4rt04t0th304p3x07}
+EOF
+)
+echo "$ascii_art"
+echo -e "\nThanks for playing" >&2
+kill -s SIGPIPE $PPID
