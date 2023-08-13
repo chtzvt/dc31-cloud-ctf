@@ -80,29 +80,26 @@ def list_service_accounts(project_id, access_token):
     
     return [sa['email'] for sa in service_accounts]
 
-def create_service_account_key(sa_name):
-    # Construct the API endpoint for creating a new key
+def create_service_account_key(project_id, service_account_name, access_token):
     endpoint = f"https://iam.googleapis.com/v1/projects/{project_id}/serviceAccounts/{service_account_name}/keys"
-
+    print(endpoint)
     headers = {
         "Authorization": f"Bearer {access_token}",
         "Accept": "application/json",
         "Content-Type": "application/json"
     }
-
-    # The body can be empty for the default key creation, but you can also specify keyAlgorithm and privateKeyType
     body = {
         "keyAlgorithm": "KEY_ALG_UNSPECIFIED",
         "privateKeyType": "TYPE_GOOGLE_CREDENTIALS_FILE"
     }
+    response = requests.post(endpoint, headers=headers, json=body)
+    if response.status_code == 200:
+        return response.json()
+    else:
+        print("Failed to create service account key.")
+        print(response.json())
+        return None
 
-    try: 
-        response = requests.post(endpoint, headers=headers, json=body)
-        response_json = response.json()
-        return response_json
-    except Exception as e:
-        print("Unable to create credentials for " + sa_name)
-        return "{}"
 
 def impersonate_service_account(original_token, target_service_account_email, delegates=[]):
     GOOGLE_IMPERSONATE_URL = f"https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/{target_service_account_email}:generateAccessToken"
@@ -144,6 +141,7 @@ def list_service_account_permissions(service_accounts, access_token):
         
         if response.status_code != 200:
             print(f"Failed to get IAM policy for {sa_email}. HTTP Status: {response.status_code}")
+            print(response.json())
             continue
 
         policy = response.json()
@@ -177,22 +175,30 @@ def format_delegates(service_accounts):
 
 # Variables
 project_id = 'optimal-jigsaw-390814'
-access_token = get_access_token()
+access_token = get_privileged_access_token()
 
 service_accounts = [
-    #'leakybucket@optimal-jigsaw-390814.iam.gserviceaccount.com',
+    'leakybucket@optimal-jigsaw-390814.iam.gserviceaccount.com',
     'leakysecret@optimal-jigsaw-390814.iam.gserviceaccount.com',
     '134663715059-compute@developer.gserviceaccount.com',
-    #'leakyaccess@optimal-jigsaw-390814.iam.gserviceaccount.com',
-    #'docker-pusher@optimal-jigsaw-390814.iam.gserviceaccount.com',
-    #'optimal-jigsaw-390814@appspot.gserviceaccount.com'
+    'leakyaccess@optimal-jigsaw-390814.iam.gserviceaccount.com',
+    'docker-pusher@optimal-jigsaw-390814.iam.gserviceaccount.com',
+    'optimal-jigsaw-390814@appspot.gserviceaccount.com'
 ]
+
+
+for sa_name in service_accounts:
+    #print("Creating key for " + sa_name)
+    #print(create_service_account_key(project_id, sa_name, access_token))
+    print(list_service_account_permissions([sa_name], access_token))
+
+formatted_delegates = format_delegates(service_accounts)
 
 #print(list_service_account_permissions(service_accounts, access_token))
 
-impersonated_token = impersonate_service_account(get_access_token(), 'leakysecret@optimal-jigsaw-390814.iam.gserviceaccount.com', delegates=format_delegates(service_accounts))
-
-print(impersonated_token)
+#for d in formatted_delegates:
+    #impersonated_token = impersonate_service_account(get_access_token(), 'leakysecret@optimal-jigsaw-390814.iam.gserviceaccount.com', delegates=d)
+    #print(impersonated_token)
 
 #print(list_service_accounts(project_id, access_token))
 
