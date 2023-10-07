@@ -8,4 +8,5 @@ Featuring @chtzvt as [interposer](https://ctf.cloud-village.org/users/402) and @
 
 ### Writeups
 
-See https://blog.ctis.me.
+- [Eric's writeup.](https://eric-smithson.github.io/smitti-site/blog/2023/10/04/defcon-31-cloud-village-ctf.html)
+- [Charlton's writeup.](https://blog.ctis.me/2023/10/defcon-31-cloud-ctf-writeup/)
